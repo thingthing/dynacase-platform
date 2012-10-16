@@ -785,7 +785,7 @@ class WDoc extends Doc
             "message" => $err
         ));
         $this->doc->disableEditControl();
-        if (!$this->domainid) $this->doc->unlock(false, true);
+        if (!$this->doc->domainid) $this->doc->unlock(false, true);
         $this->workflowSendMailTemplate($newstate, $addcomment, $tname);
         $this->workflowAttachTimer($newstate, $tname);
         $err.= $this->changeAllocateUser($newstate);
@@ -798,6 +798,7 @@ class WDoc extends Doc
         // search if following states in concordance with transition array
         if ($this->doc->locked == - 1) return array(); // no next state for revised document
         if (($this->doc->locked > 0) && ($this->doc->locked != $this->doc->userid)) return array(); // no next state if locked by another person
+        if ($this->doc->lockdomainid > 0) return array(); // no next state if locked in a domain
         $fstate = array();
         if ($this->doc->state == "") $this->doc->state = $this->getFirstState();
         
