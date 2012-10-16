@@ -4589,6 +4589,7 @@ create unique index i_docir on doc(initid, revision);";
         {
             if ($this->locked == - 1) return; // no refresh revised document
             if (($this->doctype == 'C') || ($this->doctype == 'Z')) return; // no refresh for family  and zombie document
+            if ($this->lockdomainid > 0) return '';
             $changed = $this->hasChanged;
             if (!$changed) $this->disableEditControl(); // disabled control just to refresh
             $err = $this->SpecRefresh();
