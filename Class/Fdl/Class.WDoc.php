@@ -793,12 +793,13 @@ class WDoc extends Doc
         return $err;
     }
     // --------------------------------------------------------------------
-    function getFollowingStates()
+    function getFollowingStates($noVerifyDomain=false)
     {
         // search if following states in concordance with transition array
         if ($this->doc->locked == - 1) return array(); // no next state for revised document
         if (($this->doc->locked > 0) && ($this->doc->locked != $this->doc->userid)) return array(); // no next state if locked by another person
-        if ($this->doc->lockdomainid > 0) return array(); // no next state if locked in a domain
+
+        if ((!$noVerifyDomain) && ($this->doc->lockdomainid > 0)) return array(); // no next state if locked in a domain
         $fstate = array();
         if ($this->doc->state == "") $this->doc->state = $this->getFirstState();
         
