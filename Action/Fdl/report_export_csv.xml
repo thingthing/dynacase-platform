@@ -95,6 +95,9 @@
                 </table>
             </div>
         </div>
+        [BLOCK addedArguments]
+        <input type="hidden" value="[argumentValue]" name="[argumentName]" />
+        [ENDBLOCK addedArguments]
         <input type="hidden" value="[id]" name="id" />
         <input type="hidden" value="TRUE" name="updateDefault" />
         <input style='float : right; margin-right : 25 px' type='submit' value="[TEXT:EXPORT_CSV Exporter]" />
