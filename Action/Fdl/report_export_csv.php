@@ -11,28 +11,29 @@ require_once 'EXTERNALS/fdl.php';
 /**
  * Export a report in CSV
  *
- * @note 
+ * @note
  * @verbatim
  Usage :
- 	--app=FDL : <application name>
- 	--action=REPORT_EXPORT_CSV : <action name>
- 	--id=<the id of the report>
-    Options:
- 	--refresh=<would you refresh doc before build report> [TRUE|FALSE], default is 'FALSE'
- 	--kind=<the kind of report> [simple|pivot], default is 'simple'
- 	--pivot=<the pivot attr>, default is 'id'
- 	--delimiter=<the CSV delimiter>, default is ';'
- 	--enclosure=<the CSV enclosure>, default is '"'
- 	--encoding=<the CSV encoding>, default is 'ISO-8859-15//TRANSLIT'
- 	--decimalSeparator=<the decimalSeparator>, default is '.'
- 	--dateFormat=<the dateFormat> [US|FR|ISO], default is 'US
-@endverbatim
-*/
+ --app=FDL : <application name>
+ --action=REPORT_EXPORT_CSV : <action name>
+ --id=<the id of the report>
+ Options:
+ --refresh=<would you refresh doc before build report> [TRUE|FALSE], default is 'FALSE'
+ --kind=<the kind of report> [simple|pivot], default is 'simple'
+ --pivot=<the pivot attr>, default is 'id'
+ --delimiter=<the CSV delimiter>, default is ';'
+ --enclosure=<the CSV enclosure>, default is '"'
+ --encoding=<the CSV encoding>, default is 'ISO-8859-15//TRANSLIT'
+ --decimalSeparator=<the decimalSeparator>, default is '.'
+ --dateFormat=<the dateFormat> [US|FR|ISO], default is 'US
+ @endverbatim
+ */
 function report_export_csv(Action & $action)
 {
     $dbaccess = getParam('FREEDOM_DB');
     
     $argumentsCSV = array();
+    
     $defaultArgument = json_decode(getParam("REPORT_DEFAULT_CSV", "[]") , true);
     
     $usage = new ActionUsage($action);
@@ -77,7 +78,37 @@ function report_export_csv(Action & $action)
     $displayForm = $usage->addHidden("displayForm", "");
     $updateDefault = $usage->addHidden("updateDefault", "");
     
+    $usage->strict(false);
     $usage->verify();
+    
+    $usageArguments = array(
+        "sole",
+        "app",
+        "action",
+        "id",
+        "refresh",
+        "kind",
+        "pivot",
+        "delimiter",
+        "enclosure",
+        "encoding",
+        "decimalSeparator",
+        "dateFormat",
+        "displayForm",
+        "updateDefault"
+    );
+    $addedArguments = array();
+    
+    foreach ($_GET as $key => $value) {
+        if (!in_array($key, $usageArguments)) {
+            $addedArguments[] = array(
+                "argumentName" => $key,
+                "argumentValue" => $value
+            );
+        }
+    }
+    
+    $action->lay->setBlockData("addedArguments", $addedArguments);
     
     if ($updateDefault) {
         $action->setParamU("REPORT_DEFAULT_CSV", json_encode($argumentsCSV));
@@ -181,7 +212,7 @@ function report_export_csv(Action & $action)
             $fp = fopen($csvFile, 'w');
             
             foreach ($csvStruct as $currentLine) {
-                if ($encoding != "utf8") {
+                if ($argumentsCSV["encoding"] != "UTF-8") {
                     $currentLine = convertLine($currentLine, $argumentsCSV["encoding"]);
                 }
                 fputcsv($fp, $currentLine, $argumentsCSV["delimiter"], $argumentsCSV["enclosure"]);
