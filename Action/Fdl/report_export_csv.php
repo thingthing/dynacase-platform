@@ -116,7 +116,9 @@ function report_export_csv(Action & $action)
             "kind" => $kind,
             "pivot" => $pivot
         )));
-        error_log(__LINE__ . var_export($err, true));
+        if ($err) {
+            error_log(__LINE__ . " " . var_export($err, true));
+        }
     }
     
     if ($displayForm) {
