@@ -320,18 +320,12 @@ function getHtmlInput(&$doc, &$oattr, $value, $index = "", $jsevent = "", $notd 
                     $lay = new Layout("FDL/Layout/editmdoc.xml", $action);
                     getLayMultiDoc($lay, $doc, $oattr, $value, $attrin, $index);
                     
-                    $cible = "work";
+                    $cible = "mdocid_work";
                     if (($visibility == "R") || ($visibility == "S")) $lay->set("disabled", $idisabled);
                     else $lay->set("disabled", "");
                     $lay->set("cible", $cible);
                     
                     $input2 = $lay->gen();
-                    $autocomplete = " autocomplete=\"off\" autoinput=\"1\" onfocus=\"activeAuto(event," . $docid . ",this,'$iopt','$attrid','$index')\" ";
-                    $oc.= $autocomplete;
-                    if (!$oattr->phpfile) {
-                        $oattr->phpfile = "fdl.php";
-                        $oattr->phpfunc = "zou";
-                    }
                 } else {
                     $input2 = "";
                     
@@ -339,23 +333,24 @@ function getHtmlInput(&$doc, &$oattr, $value, $index = "", $jsevent = "", $notd 
                     else $input = "<input type=\"hidden\"  name=\"" . $attrin . "\"";
                     $input.= " id=\"" . $attridk . "\" value=\"$value\">";
                     $cible = "";
-                    if (!$oattr->phpfile) {
-                        $oattr->phpfile = "fdl.php";
-                        $oattr->phpfunc = "lfamily(D,$famid,${linkprefix}${attrid}):${cible}$attrid,${linkprefix}${attrid}";
-                    } else {
-                        $phpfunc = preg_replace('/([\s|,|:])CT([\s|,|\)]|$)/', '$1' . $linkprefix . $attrid . '$2', $oattr->phpfunc);
-                        $phpfunc = str_replace("):$attrid,", "):${cible}${attrid},", $phpfunc);
-                        $phpfunc = str_replace("):" . strtoupper($attrid) . ",", "):${cible}${attrid},", $phpfunc);
-                        $oattr->phpfunc = $phpfunc;
-                    }
-                    if ($docid == 0) {
-                        // case of specific interface
-                        $iopt = '&phpfile=' . $oattr->phpfile . '&phpfunc=' . $oattr->phpfunc . '&label=' . ($oattr->getLabel());
-                    }
-                    $autocomplete = " autocomplete=\"off\" autoinput=\"1\" onfocus=\"activeAuto(event," . $docid . ",this,'$iopt','$attrid','$index')\" ";
-                    $oc.= $autocomplete;
                     $textvalue = $doc->getTitle(trim($value) , '', $needLatest);
                 }
+                
+                if (!$oattr->phpfile) {
+                    $oattr->phpfile = "fdl.php";
+                    $oattr->phpfunc = "lfamily(D,$famid,${linkprefix}${attrid}):${cible}$attrid,${linkprefix}${attrid}";
+                } else {
+                    $phpfunc = preg_replace('/([\s|,|:])CT([\s|,|\)]|$)/', '$1' . $linkprefix . $attrid . '$2', $oattr->phpfunc);
+                    $phpfunc = str_replace("):$attrid,", "):${cible}${attrid},", $phpfunc);
+                    $phpfunc = str_replace("):" . strtoupper($attrid) . ",", "):${cible}${attrid},", $phpfunc);
+                    $oattr->phpfunc = $phpfunc;
+                }
+                if ($docid == 0) {
+                    // case of specific interface
+                    $iopt = '&phpfile=' . $oattr->phpfile . '&phpfunc=' . $oattr->phpfunc . '&label=' . ($oattr->getLabel());
+                }
+                $autocomplete = " autocomplete=\"off\" autoinput=\"1\" onfocus=\"activeAuto(event," . $docid . ",this,'$iopt','$attrid','$index')\" ";
+                $oc.= $autocomplete;
                 
                 $famid = $oattr->format;
                 $input.= "<input $classname $autocomplete $jsevent onchange=\"addmdocs('$attrin');document.isChanged=true\" type=\"text\" name=\"_${linkprefix}" . substr($attrin, 1) . "\"";
