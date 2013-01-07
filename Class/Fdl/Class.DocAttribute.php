@@ -543,8 +543,8 @@ Class NormalAttribute extends BasicAttribute
                         $enumKey = trim($enumKey);
                         if (strlen($enumKey) == 0) $enumKey = " ";
                         $enumValue = trim($enumValue);
-                        $translatedEnumValue = _($br . $enumValue);
-                        if ($translatedEnumValue != $br . $enumValue) {
+                        $translatedEnumValue = _($br . $enumKey);
+                        if ($translatedEnumValue != $br . $enumKey) {
                             $enumValue = $translatedEnumValue;
                         }
                         
