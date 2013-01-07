@@ -49,6 +49,7 @@ function generic_list(&$action)
     $column = generic_viewmode($action, $famid); // choose the good view mode
     $dbaccess = $action->GetParam("FREEDOM_DB");
     $action->parent->addCssRef("GENERIC:generic_list.css", true);
+    $action->parent->AddJsRef($action->GetParam("CORE_JSURL") . "/AnchorPosition.js", false);
     //change famid if it is a simplesearch
     $sfamid = $famid;
     if ($dirid) {
