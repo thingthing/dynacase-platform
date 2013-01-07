@@ -160,6 +160,9 @@ begin
    if ((upperm & a_pos) != 0) then
      return true;
    end if;
+   if ( (unperm & a_pos) != 0) then
+     return false;
+   end if;
    if ((uperm & a_pos) != 0) then
       return true;
    end if;
