@@ -60,7 +60,7 @@ if ($docid) {
     } else $docid = $d->id;
 }
 if ($docid > 0) $s->addFilter("id = $docid");
-if ($fldid > 0) $s->dirid = $fldid;
+if ($fldid != "") $s->useCollection($fldid);
 if ($allrev) $s->latest = false;
 $s->search();
 
