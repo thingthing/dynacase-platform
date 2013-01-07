@@ -327,7 +327,7 @@ create sequence seq_waittransaction start 1;
                         $this->status = self::conflict;
                     } else {
                         if ($currentDoc->locked != $currentDoc->getSystemUserId()) {
-                            $this->statusmessage = sprintf("document %s [%d] not locked");
+                            $this->statusmessage = sprintf('document "%s" [%d] not locked', $currentDoc->getTitle() , $currentDoc->id);
                             $this->status = self::conflict;
                         } else {
                             if ($mask) $currentDoc->ApplyMask($mask);
@@ -353,7 +353,7 @@ create sequence seq_waittransaction start 1;
                         }
                     }
                 } else {
-                    $this->statusmessage = sprintf("document %s [%d] not exists");
+                    $this->statusmessage = sprintf("document with id %d does not exists", $this->refererid);
                     $this->status = self::conflict;
                 }
             } else {
