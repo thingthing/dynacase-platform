@@ -136,6 +136,7 @@ function ec_setIValue(winfo,i,v) {
             var isMultiple = 'false';
             var values = v;
             var elem = winfo.document.getElementById("sp_"+ i.id);
+            var hasEmptyField = false;
             if (elem) {
                 isMultiple = elem.parentNode.parentNode.parentNode.parentNode.getAttribute("multiple");
             }
@@ -143,6 +144,9 @@ function ec_setIValue(winfo,i,v) {
                 values = v.split("\n");
             }
             for (var k=0;k<i.options.length;k++) {
+                if (i.options[k].value == " ") {
+                    hasEmptyField = true;
+                }
                 if (isMultiple != 'false') {
                     var valueToCheck = _inarray(i.options[k].value, values);
                     for (var index=0;index<values.length;index++) {
@@ -150,6 +154,10 @@ function ec_setIValue(winfo,i,v) {
                         else if(!valueToCheck) i.options[k].selected=false;
                     }
                 } else if (i.options[k].value == v) i.selectedIndex=k;
+            }
+            if (values == " " && !hasEmptyField) {
+                i.add(new Option("[TEXT:Do choice]", values, true));
+                i.selectedIndex= i.options.length - 1;
             }
         }
         ec_setIValuePlus(winfo,i.id,v);
