@@ -53,17 +53,17 @@ function scrutemdocs() {
   
 }
 
-var addmdocsSemaphore = false; // avoid several launchs of addmdocs
+var addmdocsSemaphore = new Array(); // avoid several launchs of addmdocs
 function addmdocs(n) {    
   var iid,tiid;
   var inpid,inptext,inpsel,inptitle;
   var itext,isel,ititle;
   var ti;
   var nid,ntitle,nval;
-  if(addmdocsSemaphore) {
+  if(addmdocsSemaphore[n]) {
 	  return;
   }
-  addmdocsSemaphore = true;
+  addmdocsSemaphore[n] = true;
       
   
   tiid=[];
@@ -84,29 +84,33 @@ function addmdocs(n) {
 	ititle='ilink_'+itext;
 	isel='mdocid_isel_'+itext;
 	inptext=document.getElementById(itext);
-	inptitle=document.getElementById(ititle);
-	inpsel=document.getElementById(isel);	   
+    inptitle=document.getElementById("hidden_"+ititle)?document.getElementById("hidden_"+ititle):document.getElementById(ititle);	inpsel=document.getElementById(isel);
 	if (inpsel && inptext) {
-	  nid=inpid.value;
+        if (inpid.value != " ") {
+	  nid=inpid.value.split("\n");
 	  if (! inptitle) ntitle=nid;
 	  else ntitle=inptitle.value;
-	  // verify if no double
-	  var find=false;
-	  for (var k=0;k<inpsel.options.length;k++) {
-	    if (inpsel.options[k].value==nid) find=true;
-	  }
-	  if (! find)  addinlist(inpsel,ntitle,nid,false);
-	  else alert('[TEXT:item already set]');
+      ntitle = ntitle.split("\n");
+        for (var index=0;index<nid.length;index++) {
+            // verify if no double
+            var find=false;
+            for (var k=0;k<inpsel.options.length;k++) {
+                if (inpsel.options[k].value==nid[index]) find=true;
+            }
+            if (! find)  addinlist(inpsel,ntitle[index],nid[index],false);
+            else alert('[TEXT:item already set]');
+        }
+        }
 	  inpid.value='';
 	  inptitle.value='';
-	  inptitle.focus();
+        document.getElementById(ititle).focus();
 	  transfertDocIdInputs(inpsel,inptext);
 
 	}
       }
     }
   }
-  addmdocsSemaphore = false;
+  addmdocsSemaphore[n] = false;
     
 }
 function addmdocsattrid(attrid,nid,ntitle) { 
@@ -126,7 +130,7 @@ function addmdocsattrid(attrid,nid,ntitle) {
     transfertDocIdInputs(inpsel,inptext);
   }  
 }
-function clearDocIdInputs(attrid,selid,th) {
+function clearDocIdInputs(attrid,selid,th,clearall) {
     var inpsel=document.getElementById(selid);
 
     if (inpsel) {
@@ -134,7 +138,7 @@ function clearDocIdInputs(attrid,selid,th) {
         var inptext=document.getElementById(itext);
         if (inptext) {
             for (var k=0;k<inpsel.options.length;k++) {
-                if (inpsel.options[k].selected) inpsel.remove(k--);
+                if (clearall || inpsel.options[k].selected) inpsel.remove(k--);
             }
             if (th) th.disabled=true;
             transfertDocIdInputs(inpsel,inptext);
@@ -1155,14 +1159,20 @@ function deleteInputValue(id){
 	if (document.getElementById(id)) {
 		if (! isInputLocked(id)) {	
 			var el = document.getElementById(id);
+            if (el.tagName.toLowerCase()=='textarea' &&  document.getElementById("mdocid_work"+id)) {
+                clearDocIdInputs(id, 'mdocid_isel_'+id, document.getElementById("ix_"+id), true);
+            }
 			el.value = ' ';
 			
 			if ((el.tagName.toLowerCase()=='textarea') && (el.getAttribute('type')=='htmltext')) {
 			    var oFck=FCKeditorAPI.GetInstance(el.id);
 			    if (oFck) {
 			        oFck.SetData('');
-			    } 
-			}
+			    }
+            }
+            if (el.tagName.toLowerCase()=='select') {
+                unselectInput(id);
+            }
 			if( el.className.match(/^color\b/) ) {
 				el.style.backgroundColor = '';
 			}
@@ -1215,12 +1225,19 @@ function addEnum(th,cible,docid,attrid,key,index) {
 
 function unselectInput(id) {
   var sel=document.getElementById(id);
+    var hasEmptyField = -1;
   if (sel) {
     for (var i=0; i< sel.options.length; i++) {
+        if (sel.options[i].value == " ") hasEmptyField = i;
       sel.options[i].selected=false;
     }
   }
-  sel.options[sel.options.length-1].selected=true;
+    if (hasEmptyField < 0) {
+        sel.add(new Option("[TEXT:Do choice]", " ", true));
+        //Selected for ie
+        sel.options[sel.options.length - 1].selected = true;
+    }
+  else sel.options[hasEmptyField].selected=true;
 }
 function autoUnlock(docid) {
   var r;
@@ -1695,8 +1712,8 @@ function updateEnumBoolCheck(icheck) {
     }
     
 }
-function updateEnumCheck(icheck) {
-    var idc=icheck.id;
+function updateEnumCheck(icheck, isMultiple) {
+    var idc=(isMultiple ? "_" : "")+ icheck.id;
     var ichecks=document.getElementsByName(idc+'[]');
     if (ichecks.length==0) {
         // other method for IE
@@ -1711,7 +1728,7 @@ function updateEnumCheck(icheck) {
     for (var i=0;i<ichecks.length;i++) {
         if (ichecks[i].value==icheck.value) {
             ichecks[i].checked=true;
-            ichecks[i].onclick.apply(ichecks[i],[]);
+            if (ichecks[i].onclick) ichecks[i].onclick.apply(ichecks[i],[]);
         } else {
             ichecks[i].checked=false;
             ichecks[i].parentNode.parentNode.className='nochecked';
@@ -1847,13 +1864,12 @@ function updateBoolCheck(inp, val1, val2) {
 }
 
 
-
 function addinlist(sel,value,key,notselected) {
 
   if (isNetscape) pos=null;
   else pos=sel.options.length+1;
   if (! key) key=value;
-  sel.add(new Option(value,key, false, true),pos);
+  sel.add(new Option(trim(value),trim(key), false, true),pos);
   if (notselected) {
     sel.options[sel.options.length - 1].selected=false;
   } 
