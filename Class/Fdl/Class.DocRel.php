@@ -118,16 +118,13 @@ create unique index docrel_u on docrel(sinitid,cinitid,type);
     {
         $nattr = $doc->GetNormalAttributes();
         foreach ($nattr as $k => $v) {
-            if (isset($doc->$k) && ($doc->$k != "") && ($v->type == "docid")) {
-                
-                if (!$force) {
-                    if ($doc->getOldValue($v->id) === false) {
+            if (isset($doc->$k) && ($v->type == "docid")) {
+                if (!$force && $doc->getOldValue($v->id) === false) {
                         continue;
-                    } else {
-                        // reset old relations
-                        $this->exec_query("delete from docrel where sinitid=" . $doc->initid . " and type = '" . $v->id . "'");
-                    }
                 }
+                // reset old relations
+                $this->exec_query("delete from docrel where sinitid=" . $doc->initid . " and type = '" . $v->id . "'");
+
                 if ($v->inArray()) $tv = array_unique($doc->getTValue($v->id));
                 else $tv = array(
                     $doc->$k
