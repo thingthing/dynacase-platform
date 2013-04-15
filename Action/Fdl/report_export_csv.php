@@ -47,10 +47,10 @@ function report_export_csv(Action & $action)
         $defaultDocArg = json_decode($currentUserTag->comment, true);
     }
     
-    $refresh = $usage->addOption("refresh", "would you refresh doc before build report", array(
+    $refresh = ($usage->addOption("refresh", "would you refresh doc before build report", array(
         "TRUE",
         "FALSE"
-    ) , "FALSE");
+    ) , "FALSE") == "TRUE");
     
     $default = isset($defaultDocArg["kind"]) ? $defaultDocArg["kind"] : 'simple';
     $kind = $usage->addOption("kind", "the kind of report", array(
