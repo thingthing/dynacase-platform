@@ -37,6 +37,7 @@ function loadFCKeditor_[aid]() {
   oFCKeditor.Config['ImageBrowserWindowWidth'] = '550px';
   oFCKeditor.Config['ImageBrowserWindowHeight'] = '400px';
   oFCKeditor.Config['LinkBrowser'] = false ;
+  oFCKeditor.Config['HtmlEncodeOutput'] = false ;
   //oFCKeditor.Config['FontNames'] =  'serif;sans-serif;cursive;fantasy;monospace' ;
   oFCKeditor.ToolbarSet = '[toolbar]';
   oFCKeditor.Config["CustomConfigurationsPath"] = "../../FDL/Layout/fdl_fckeditor.js"  ;

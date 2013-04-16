@@ -36,5 +36,5 @@ FCKConfig.ToolbarSets["DocAttr"] = [
 
 FCKConfig.Plugins.Add( 'quicksave', 'en,fr' ) ;
 
-FCKConfig.HtmlEncodeOutput = true ; 
+FCKConfig.HtmlEncodeOutput = false ;
 
