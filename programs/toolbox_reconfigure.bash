@@ -67,7 +67,24 @@ fi
 
 log "Updating vault r_path..."
 if [ "$vault_save" == "no" ]; then
-    PGSERVICE="$freedom_db" psql -c "DELETE FROM vaultdiskfsstorage;DELETE FROM vaultdiskdirstorage;DELETE FROM vaultdiskstorage; "
+    PGSERVICE="$freedom_db" psql -f - <<'EOF'
+BEGIN;
+CREATE OR REPLACE FUNCTION pg_temp.deleteFromIfRelationExists(arg_schemaname text, arg_relname text)
+RETURNS BOOLEAN AS
+$$
+BEGIN
+    IF EXISTS(SELECT * FROM pg_stat_all_tables WHERE schemaname = arg_schemaname AND relname = arg_relname) THEN
+        EXECUTE 'DELETE FROM ' || quote_ident(arg_schemaname) || '.' || quote_ident(arg_relname) || ';';
+        RETURN TRUE;
+    END IF;
+    RETURN FALSE;
+END;
+$$ LANGUAGE plpgsql;
+SELECT pg_temp.deleteFromIfRelationExists('public', 'vaultdiskfsstorage');
+SELECT pg_temp.deleteFromIfRelationExists('public', 'vaultdiskdirstorage');
+SELECT pg_temp.deleteFromIfRelationExists('public', 'vaultdiskstorage');
+COMMIT;
+EOF
     RET=$?
     if [ $RET -ne 0 ]; then
 	echo "Error updating vault r_path"
