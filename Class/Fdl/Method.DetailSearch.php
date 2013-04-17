@@ -76,6 +76,7 @@ class _DSEARCH extends DocSearch
             return parent::getQuery();
         }
     }
+    
     function postModify()
     {
         $err = parent::postModify();
@@ -212,6 +213,7 @@ class _DSEARCH extends DocSearch
             }
         }
     }
+    
     function preEdition()
     {
         if (count($this->getTvalue("se_filter")) > 0) {
@@ -268,6 +270,9 @@ class _DSEARCH extends DocSearch
             $val = stringdatetounixts($val);
         }
         $atype = '';
+        /**
+         * @var NormalAttribute $oa
+         */
         $oa = $this->searchfam->getAttribute($col);
         
         if ($oa) $atype = $oa->type;
@@ -290,6 +295,11 @@ class _DSEARCH extends DocSearch
                 $cfgdate = getLocaleConfig();
                 if ($val) $val = stringDateToIso($val, $cfgdate['dateFormat']);
                 if ($val2) $val2 = stringDateToIso($val2, $cfgdate['dateFormat']);
+                
+                if ($oa->isMultiple() && getLcdate() != 'iso') {
+                    $val = stringDateToLocaleDate($val, $cfgdate['dateFormat']);
+                    $val2 = stringDateToLocaleDate($val2, $cfgdate['dateFormat']);
+                }
                 
                 if (($atype == "timestamp") && ($op == "=")) {
                     
