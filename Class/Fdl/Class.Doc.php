@@ -5387,8 +5387,13 @@ create unique index i_docir on doc(initid, revision);";
 
                         case 'money':
                             
-                            $htmlval = money_format('%!.2n', doubleval($avalue));
-                            $htmlval = str_replace(" ", "&nbsp;", $htmlval); // need to replace space by non breaking spaces
+                            if ($avalue !== '') {
+                                $htmlval = money_format('%!.2n', doubleval($avalue));
+                                $htmlval = str_replace(" ", "&nbsp;", $htmlval); // need to replace space by non breaking spaces
+                                
+                            } else {
+                                $htmlval = '';
+                            }
                             break;
 
                         case 'htmltext':
@@ -5460,7 +5465,7 @@ create unique index i_docir on doc(initid, revision);";
                             break;
                         }
                         
-                        if (($aformat != "") && ($atype != "doc") && ($atype != "array") && ($atype != "option")) {
+                        if (($htmlval !== '') && ($aformat != "") && ($atype != "doc") && ($atype != "array") && ($atype != "option")) {
                             //printf($htmlval);
                             $htmlval = sprintf($aformat, $htmlval);
                         }
