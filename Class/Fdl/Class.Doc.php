@@ -2611,9 +2611,12 @@ create unique index i_docir on doc(initid, revision);";
                     $value = DELVALUE;
                 }
             } else {
-                if (count($value) == 0) $value = DELVALUE;
-                elseif ((count($value) == 1) && (first($value) === "" || first($value) === null) && (substr(key($value) , 0, 1) != "s")) $value = "\t"; // special tab for array of one empty cell
-                else {
+                if (count($value) == 0) {
+                    $value = DELVALUE;
+                } elseif ((count($value) == 1) && (first($value) === "" || first($value) === " " || first($value) === null) && (substr(key($value) , 0, 1) != "s")) {
+                    $value = "\t"; // special tab for array of one empty cell
+                    
+                } else {
                     if ($oattr->repeat && (count($value) == 1) && substr(key($value) , 0, 1) == "s") {
                         $ov = $this->getTValue($attrid);
                         $rank = intval(substr(key($value) , 1));
